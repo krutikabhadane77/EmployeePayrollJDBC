@@ -90,8 +90,12 @@ public class EmployeePayrollDBService {
         return employeePayrollList;
     }
 
-    public int updateEmployeeData(String name, double salary) throws PayrollServiceException {
+    /*public int updateEmployeeData(String name, double salary) throws PayrollServiceException {
         return this.updateEmployeeDataUsingStatement(name, salary);
+    }*/
+
+    public int updateEmployeeData(String name, double salary) throws PayrollServiceException {
+        return this.updateEmployeeDataUsingPreparedStatement(name, salary);
     }
 
     private int updateEmployeeDataUsingStatement(String name, double salary) throws PayrollServiceException {
@@ -103,5 +107,19 @@ public class EmployeePayrollDBService {
         } catch (SQLException e) {
             throw new PayrollServiceException(e.getMessage(), PayrollServiceException.ExceptionType.UPDATE_PROBLEM);
         }
+    }
+
+    public int updateEmployeeDataUsingPreparedStatement(String name, double salary) {
+        try (Connection connection = this.getConnection();) {
+            String sql = "update employee_payroll set salary=? where name=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setDouble(1, salary);
+            preparedStatement.setString(2, name);
+            int status = preparedStatement.executeUpdate();
+            return status;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
