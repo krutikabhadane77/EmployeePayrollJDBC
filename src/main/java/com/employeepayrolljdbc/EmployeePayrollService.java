@@ -37,6 +37,10 @@ public class EmployeePayrollService {
         employeePayrollList.add(new EmployeePayrollData(id, name, salary));
     }
 
+    public void addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) throws PayrollServiceException {
+        employeePayrollList.add(employeePayrollDBService.addEmployeeToPayroll(name, salary, startDate, gender));
+    }
+
     public void writeEmployeePayrollData(IOService ioService) {
         if (ioService.equals(IOService.CONSOLE_IO))
             System.out.println("\nWriting Employee Payroll Roaster to Console\n" + employeePayrollList);
