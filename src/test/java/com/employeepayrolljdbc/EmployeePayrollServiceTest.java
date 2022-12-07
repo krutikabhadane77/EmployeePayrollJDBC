@@ -41,7 +41,7 @@ public class EmployeePayrollServiceTest {
     @Test
     public void givenEmployeePayrollinDB_whenRetrieved_ShouldMatch_Employee_Count() throws PayrollServiceException {
         List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
-        Assert.assertEquals(4, employeePayrollData.size());
+        Assert.assertEquals(13, employeePayrollData.size());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class EmployeePayrollServiceTest {
         LocalDate endDate = LocalDate.now();
         List<EmployeePayrollData> employeePayrollData = employeePayrollService
                 .readEmployeePayrollForDateRange(EmployeePayrollService.IOService.DB_IO, startDate, endDate);
-        Assert.assertEquals(4, employeePayrollData.size());
+        Assert.assertEquals(13, employeePayrollData.size());
     }
 
     @Test
