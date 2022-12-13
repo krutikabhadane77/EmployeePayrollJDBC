@@ -211,4 +211,22 @@ public class EmployeePayrollDBService {
         return employeePayrollData;
     }
 
+    private List<EmployeePayrollData> getEmployeePayrollDataUsingQuery(String sql) {
+        List<EmployeePayrollData> employeePayrollList = null;
+        try (Connection connection = EmployeePayrollDBService.getConnection();) {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            ResultSet result = preparedStatement.executeQuery(sql);
+            employeePayrollList = this.getEmployeePayrollData(result);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employeePayrollList;
+    }
+
+    public List<EmployeePayrollData> readActiveEmployeeData() {
+        String sql = "select e.id,e.name,e.start,e.gender,e.salary from employee_payroll e inner join"
+                + " emp_dept_relations ed on e.id=ed.emp_id inner join department d on ed.dept_id=d.dept_id where is_active=true ;";
+        return this.getEmployeePayrollDataUsingQuery(sql);
+    }
+
 }

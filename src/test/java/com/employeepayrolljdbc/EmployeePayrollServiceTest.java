@@ -111,4 +111,15 @@ public class EmployeePayrollServiceTest {
         Assert.assertTrue(result);
     }
 
+    @Test
+    public void givenEmployeeWhenRemoved_ShouldRemainInDatabase() throws PayrollServiceException {
+        EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+        employeePayrollService.readEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
+        int countOfEmployeeRemoved = employeePayrollService.removeEmployeeFromPayroll("Mark", EmployeePayrollService.IOService.DB_IO);
+        Assert.assertEquals(2, countOfEmployeeRemoved);
+        List<EmployeePayrollData> employeePayrollData = employeePayrollService
+                .readActiveEmployeePayrollData(EmployeePayrollService.IOService.DB_IO);
+        Assert.assertEquals(4, employeePayrollData.size());
+    }
+
 }

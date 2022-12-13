@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
 public class EmployeePayrollService {
     public enum IOService{CONSOLE_IO,FILE_IO,DB_IO,REST_IO}
     private EmployeePayrollDBService employeePayrollDBService;
+    private EmployeePayrollDBServiceERD employeePayrollDBServiceERD;
     private static List<EmployeePayrollData> employeePayrollList;
 
     public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
@@ -135,6 +135,19 @@ public class EmployeePayrollService {
         if (ioService.equals(IOService.DB_IO))
             return employeePayrollDBService.getSalarySumByGender();
         return null;
+    }
+
+    public int removeEmployeeFromPayroll(String name, IOService ioService) {
+        int employeeCount=0;
+        if (ioService.equals(IOService.DB_IO))
+            employeeCount=employeePayrollDBServiceERD.removeEmployee(name);
+        return employeeCount;
+    }
+
+    public List<EmployeePayrollData> readActiveEmployeePayrollData(IOService ioService) {
+        if (ioService.equals(IOService.DB_IO))
+            this.employeePayrollList = employeePayrollDBService.readActiveEmployeeData();
+        return this.employeePayrollList;
     }
 
 }
