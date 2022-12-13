@@ -14,7 +14,7 @@ public class EmployeePayrollDBService {
     private EmployeePayrollDBService(){
 
     }
-    private Connection getConnection() throws SQLException {
+    static Connection getConnection() throws SQLException {
         String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSl=false";
         String userName = "root";
         String password = "Kruti77#";
@@ -190,7 +190,7 @@ public class EmployeePayrollDBService {
         return employeePayrollList;
     }
 
-   /* public EmployeePayrollData addEmployeeToPayroll(String name, double salary, LocalDate startDate,
+    public EmployeePayrollData addEmployeeToPayroll(String name, double salary, LocalDate startDate,
                                                     String gender) throws PayrollServiceException {
         int employeeId = -1;
         EmployeePayrollData employeePayrollData = null;
@@ -209,74 +209,6 @@ public class EmployeePayrollDBService {
             throw new PayrollServiceException(e.getMessage(), PayrollServiceException.ExceptionType.INSERTION_PROBLEM);
         }
         return employeePayrollData;
-    }*/
-
-    @SuppressWarnings("finally")
-    public EmployeePayrollData addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender)
-            throws PayrollServiceException {
-        int employeeId = -1;
-        Connection connection = null;
-        EmployeePayrollData employeePayrollData = null;
-        try {
-            connection = this.getConnection();
-            connection.setAutoCommit(false);
-        } catch (SQLException e) {
-            throw new PayrollServiceException(e.getMessage(), PayrollServiceException.ExceptionType.CONNECTION_PROBLEM);
-        }
-        try (Statement statement = connection.createStatement()) {
-            String sql = String.format(
-                    "insert into employee_payroll (name,gender,salary,start)" + "values ('%s', '%s', '%s', '%s')", name,
-                    gender, salary, Date.valueOf(startDate));
-            int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
-            if (rowAffected == 1) {
-                ResultSet resultSet = statement.getGeneratedKeys();
-                if (resultSet.next())
-                    employeeId = resultSet.getInt(1);
-            }
-        } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
-            throw new PayrollServiceException(e.getMessage(), PayrollServiceException.ExceptionType.INSERTION_PROBLEM);
-        }
-
-        try (Statement statement = connection.createStatement()) {
-            double deductions = salary * 0.2;
-            double taxablePay = salary - deductions;
-            double tax = taxablePay * 0.1;
-            double netPay = salary - tax;
-            String sql = String.format(
-                    "insert into payroll (emp_id, basic_pay, deductions, texable_pay, income_tax, net_pay) values "
-                            + "('%s', '%s', '%s', '%s', '%s', '%s')",
-                    employeeId, salary, deductions, taxablePay, tax, netPay);
-            int rowAffected = statement.executeUpdate(sql);
-            if (rowAffected == 1) {
-                employeePayrollData = new EmployeePayrollData(employeeId, name, salary, startDate);
-            }
-        } catch (SQLException e) {
-            try {
-                connection.rollback();
-                return employeePayrollData;
-            } catch (SQLException exception) {
-                exception.printStackTrace();
-            }
-            throw new PayrollServiceException(e.getMessage(), PayrollServiceException.ExceptionType.INSERTION_PROBLEM);
-        }
-        try {
-            connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null)
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    throw new PayrollServiceException(e.getMessage(),
-                            PayrollServiceException.ExceptionType.CONNECTION_PROBLEM);
-                }
-        }
-        return employeePayrollData;
     }
+
 }
